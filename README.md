@@ -1,7 +1,7 @@
 # XLcli-ai — Natural Language Excel Query CLI
 
 [![PyPI version](https://img.shields.io/pypi/v/xlcli-ai.svg)](https://pypi.org/project/xlcli-ai/)
-[![Python](https://img.shields.io/pypi/pyversions/xlcli-ai.svg)](https://pypi.org/project/xlcli-ai/)
+[![Python](https://img.shields.io/pypi/pyversions/xlcli-ai)](https://pypi.org/project/xlcli-ai/)
 [![Downloads](https://img.shields.io/pypi/dm/xlcli-ai)](https://pypi.org/project/xlcli-ai/)
 [![License](https://img.shields.io/github/license/ammarkaskar/xlcli-ai)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ammarkaskar/xlcli-ai?style=social)](https://github.com/ammarkaskar/xlcli-ai)
