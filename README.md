@@ -1,182 +1,202 @@
-# xlcli-ai  — Natural Language Excel Querying CLI
+# XLcli-ai — Natural Language Excel Query CLI
 
-Query any Excel spreadsheet using plain English, powered by Groq.
+[![PyPI version](https://img.shields.io/pypi/v/xlcli-ai.svg)](https://pypi.org/project/xlcli-ai/)
+[![Python](https://img.shields.io/pypi/pyversions/xlcli-ai.svg)](https://pypi.org/project/xlcli-ai/)
+[![Downloads](https://img.shields.io/pypi/dm/xlcli-ai)](https://pypi.org/project/xlcli-ai/)
+[![License](https://img.shields.io/github/license/ammarkaskar/xlcli-ai)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ammarkaskar/xlcli-ai?style=social)](https://github.com/ammarkaskar/xlcli-ai)
 
----
+Query Excel spreadsheets using **plain English directly from your terminal**.
 
-## Features
+XLcli converts natural language questions into SQL queries and runs them on your Excel file.
 
-- Load `.xlsx` files with pandas
-- Convert natural language questions to SQL via Groq (`groq2o`)
-- Execute SQL using pandasql (or falls back to stdlib `sqlite3` automatically)
-- Display results in a clean terminal table via tabulate
-- Graceful error handling and helpful hints
-
----
-
-## Project Structure
-
-```
-xlcli/
-├── main.py          # Entry point
-├── cli.py           # Click CLI commands & options
-├── ai_query.py      # Natural language → SQL via OpenAI API
-├── query_engine.py  # SQL execution on DataFrames + result formatting
-├── sample_data.py   # Script to generate sample sales.xlsx
-├── requirements.txt
-└── README.md
-```
+Powered by **Groq + Llama 3.3**.
 
 ---
 
-## Installation
+# ✨ Features
 
-### 1. Clone / copy the project
-
-```bash
-cd xlcli-ai
-```
-
-### 2. Create a virtual environment (recommended)
-
-```bash
-python -m venv .venv
-source .venv/bin/activate      # macOS / Linux
-.venv\Scripts\activate.bat     # Windows
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-> `pandasql` is optional. If it's not installed, xlcli automatically falls back  
-> to Python's built-in `sqlite3` — no action needed.
-
-### 4. Set your Groq API key
-
-```bash
-export GROQ_API_KEY="your_groq_api_key"          # macOS / Linux
-set GROQ_API_KEY=your_groq_api_key               # Windows CMD
-$env:GROQ_API_KEY="your_groq_api_key"            # Windows PowerShell
-```
-
-Or pass it inline with `--api-key`.
+• Query Excel files using natural language
+• AI converts questions → SQL automatically
+• Interactive chat mode for exploring data
+• Dataset insights and statistics
+• Clean terminal tables using `tabulate`
+• Works locally with your Excel files
 
 ---
 
-## Generate the Sample Dataset
+# 📦 Installation
 
-```bash
-python sample_data.py
-```
-
-This creates `sales.xlsx` with 10 rows covering Name, Department, Age, Sales,
-Region, Years\_Experience, and Rating columns.
-
----
-
-## Usage
+Install from PyPI:
 
 ```
-python main.py ask <EXCEL_FILE> "<QUESTION>" [OPTIONS]
-```
-
-### Options
-
-| Flag | Description |
-|------|-------------|
-| `--api-key TEXT` | OpenAI API key (overrides env var) |
-| `--sheet TEXT/INT` | Sheet name or 0-based index (default: 0) |
-| `--no-sql` | Suppress the generated SQL output |
-| `--help` | Show help message |
-
----
-
-## Examples
-
-```bash
-# Who has the highest sales?
-python main.py ask sales.xlsx "Who has the highest sales?"
-
-# Employees older than 25
-python main.py ask sales.xlsx "Show employees older than 25"
-
-# Average sales
-python main.py ask sales.xlsx "What is the average sales?"
-
-# Top 3 salespeople by region
-python main.py ask sales.xlsx "Show the top 3 salespeople in the North region"
-
-# Department summary
-python main.py ask sales.xlsx "What is the total sales per department?"
-
-# Use a specific sheet
-python main.py ask report.xlsx "Summarise revenue by quarter" --sheet "Q1"
-
-# Hide the SQL output
-python main.py ask sales.xlsx "Who has the lowest rating?" --no-sql
+pip install xlcli-ai
 ```
 
 ---
 
-## Example Output
+# 🚀 Quick Start
+
+Ask a question about your Excel file:
 
 ```
-📂  Loading sales.xlsx …
-✅  Loaded 10 rows × 7 columns (Name, Department, Age, Sales, Region…)
+xlcli ask sales.xlsx "highest sales"
+```
 
-🤖  Asking AI to generate SQL …
+Start interactive chat mode:
 
-────────────────────────────────────────────────────────────
+```
+xlcli chat sales.xlsx
+```
+
+View dataset insights:
+
+```
+xlcli insights sales.xlsx
+```
+
+View the spreadsheet:
+
+```
+xlcli view sales.xlsx
+```
+
+---
+
+# 💻 Example
+
+### Ask a question
+
+```
+xlcli ask sales.xlsx "highest sales"
+```
+
+Output:
+
+```
 Generated SQL:
 SELECT Name, Sales FROM df ORDER BY Sales DESC LIMIT 1
-────────────────────────────────────────────────────────────
 
-────────────────────────────────────────────────────────────
 Result:
-╭───────┬───────╮
-│ Name  │ Sales │
-├───────┼───────┤
-│ Frank │   520 │
-╰───────┴───────╯
-────────────────────────────────────────────────────────────
 
-1 row(s) returned.
+┌────────┬───────┐
+│ Name   │ Sales │
+├────────┼───────┤
+│ Ammar  │ 523   │
+└────────┴───────┘
 ```
 
 ---
 
-## Error Handling
+# 💬 Chat Mode
 
-| Situation | Behaviour |
-|-----------|-----------|
-| Missing API key | Clear error message with instructions |
-| Corrupt / missing Excel file | Descriptive error, non-zero exit |
-| AI returns invalid SQL | Error shown; user prompted to rephrase |
-| Query returns no rows | Friendly "no results" message |
-| `pandasql` not installed | Silent fallback to `sqlite3` |
+```
+xlcli chat sales.xlsx
+```
 
----
+Example:
 
-## Dependencies
+```
+> name and department
 
-| Package | Purpose |
-|---------|---------|
-| `pandas` | Load and manipulate Excel data |
-| `openpyxl` | Excel file backend for pandas |
-| `openai` | Call GPT to generate SQL |
-| `tabulate` | Pretty-print results in the terminal |
-| `click` | Build the CLI interface |
-| `pandasql` *(optional)* | Run SQL on DataFrames (falls back to sqlite3) |
+Alice   Sales
+Bob     Engineering
+Carol   Sales
+David   Marketing
+...
+```
+
+Type `exit` to quit chat mode.
 
 ---
 
-## Tips
+# 📊 Dataset Insights
 
-- Column names with spaces are automatically converted to underscores  
-  (`Sales Amount` → `Sales_Amount`) so SQL works cleanly.
-- The AI always uses `gpt-4o-mini` (fast + cheap). Change `model=` in  
-  `ai_query.py` if you prefer `gpt-4o` for more complex queries.
-- Keep questions specific for best SQL generation accuracy.
+```
+xlcli insights sales.xlsx
+```
+
+Example output:
+
+```
+Sales:
+Highest : 523 (Ammar)
+Average : 315.73
+Lowest  : 95 (Eve)
+```
+
+Includes:
+
+• column statistics
+• department distribution
+• region distribution
+
+---
+
+# 🧠 How It Works
+
+1. Load Excel file with **pandas**
+2. Convert natural language → SQL via **Groq LLM**
+3. Execute SQL query on the dataframe
+4. Display results in terminal tables
+
+---
+
+# 🛠 Project Structure
+
+```
+xlcli-ai
+│
+├── xlcli
+│   ├── __init__.py
+│   ├── main.py
+│   ├── cli.py
+│   ├── ai_query.py
+│   ├── query_engine.py
+│   └── insights.py
+│
+├── pyproject.toml
+├── README.md
+├── requirements.txt
+└── sales.xlsx
+```
+
+---
+
+# 📈 Roadmap
+
+* [ ] Data cleaning command
+* [ ] Chart generation
+* [ ] Multiple sheet support
+* [ ] Streaming query results
+
+---
+
+# 🤝 Contributing
+
+Pull requests are welcome.
+
+Steps:
+
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
+
+---
+
+# 📜 License
+
+MIT License
+
+---
+
+# 👨‍💻 Author
+
+**Ammar Kaskar**
+
+GitHub:
+https://github.com/ammarkaskar
+
+---
+
+⭐ If you like this project, consider giving it a star!
