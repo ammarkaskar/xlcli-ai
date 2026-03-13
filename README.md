@@ -1,4 +1,4 @@
-# xlcli — Natural Language Excel Querying CLI
+# xlcli-ai  — Natural Language Excel Querying CLI
 
 Query any Excel spreadsheet using plain English, powered by Groq.
 
