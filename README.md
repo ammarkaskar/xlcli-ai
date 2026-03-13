@@ -34,7 +34,7 @@ xlcli/
 ### 1. Clone / copy the project
 
 ```bash
-cd xlcli
+cd xlcli-ai
 ```
 
 ### 2. Create a virtual environment (recommended)
