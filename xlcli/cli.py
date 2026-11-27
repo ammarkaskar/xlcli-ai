@@ -15,6 +15,7 @@ colorama.init(autoreset=True)
 
 from .ai_query import natural_language_to_sql
 from .query_engine import run_sql_on_dataframe, format_results
+from .data_cleaning import clean_workbook
 
 VERSION = "1.0.0"
 COMMIT  = "a1b2c3d"
@@ -122,6 +123,7 @@ def cli(ctx):
         print(Fore.WHITE + "    xlcli ask  <file.xlsx> \"question\"  - Query with AI")
         print(Fore.WHITE + "    xlcli edit <file.xlsx>              - Edit the file")
         print(Fore.WHITE + "    xlcli view <file.xlsx>              - View all rows")
+        print(Fore.WHITE + "    xlcli clean <file.xlsx>             - Clean a worksheet")
         print()
 
 
@@ -601,3 +603,37 @@ def chat(excel_file, api_key, sheet):
 
         # Save to history
         history.append((question, answer if len(answer) < 80 else answer[:77] + "..."))
+
+
+# ─────────────────────────────────────────────────────────────
+# CLEAN command
+# ─────────────────────────────────────────────────────────────
+@cli.command("clean")
+@click.argument("excel_file", required=True, type=click.Path(exists=True, dir_okay=False))
+@click.option("--sheet", default="0", show_default=True, help="Worksheet name or zero-based index.")
+@click.option("--output", type=click.Path(dir_okay=False), help="Output .xlsx path.")
+@click.option("--no-trim-whitespace", is_flag=True, help="Keep surrounding whitespace in text and headers.")
+@click.option("--drop-duplicates", is_flag=True, help="Remove duplicate rows from the selected worksheet.")
+@click.option("--drop-missing", is_flag=True, help="Remove rows containing missing values.")
+@click.option("--fill-missing", metavar="VALUE", help="Replace missing cells with VALUE.")
+def clean(excel_file, sheet, output, no_trim_whitespace, drop_duplicates, drop_missing, fill_missing):
+    """Clean an EXCEL_FILE worksheet and save a cleaned copy."""
+    print_banner()
+    sheet_param = int(sheet) if sheet.isdigit() else sheet
+
+    try:
+        output_file, before, after = clean_workbook(
+            excel_file,
+            sheet=sheet_param,
+            output=output,
+            trim_whitespace=not no_trim_whitespace,
+            drop_duplicates=drop_duplicates,
+            drop_missing=drop_missing,
+            fill_missing=fill_missing,
+        )
+    except Exception as exc:
+        print(Fore.RED + Style.BRIGHT + f"\n  [ERROR] Could not clean workbook: {exc}")
+        raise click.ClickException(str(exc)) from exc
+
+    print(Fore.GREEN + Style.BRIGHT + f"  [OK] Cleaned worksheet: {before:,} -> {after:,} rows")
+    print(Fore.WHITE + f"  Saved workbook to {Fore.CYAN + Style.BRIGHT}{output_file}")

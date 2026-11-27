@@ -21,6 +21,7 @@ Powered by **Groq + Llama 3.3**.
 • AI converts questions → SQL automatically
 • Interactive chat mode for exploring data
 • Dataset insights and statistics
+• Clean spreadsheet data with the `clean` command
 • Clean terminal tables using `tabulate`
 • Works locally with your Excel files
 
@@ -61,6 +62,25 @@ View the spreadsheet:
 ```
 xlcli view sales.xlsx
 ```
+
+Clean whitespace in a worksheet and save a separate cleaned workbook:
+
+```bash
+xlcli clean sales.xlsx
+```
+
+Choose a worksheet by its zero-based index or name, and opt into removing
+duplicate rows, removing rows with missing values, or filling missing cells:
+
+```bash
+xlcli clean sales.xlsx --sheet 1 --drop-duplicates
+xlcli clean sales.xlsx --sheet "Sales 2025" --drop-missing
+xlcli clean sales.xlsx --fill-missing "Unknown" --output sales-ready.xlsx
+```
+
+The selected worksheet is cleaned while the other worksheets' data is copied
+to the output workbook. The source file is left unchanged. By default, output
+is written beside it with a `_cleaned.xlsx` suffix.
 
 ---
 
@@ -166,7 +186,7 @@ xlcli-ai
 
 # 📈 Roadmap
 
-* [ ] Data cleaning command
+* [x] Data cleaning command
 * [ ] Chart generation
 * [ ] Multiple sheet support
 * [ ] Streaming query results
